@@ -3,7 +3,6 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <a class="navbar-brand" href="#">My Shop</a>
       <div
-        type="button"
         style="border:none"
         class="navbar-toggler"
         data-toggle="collapse"
@@ -32,7 +31,7 @@
       </div>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <form class="form-inline my-2 my-lg-0">
+        <div class="form-inline my-2 my-lg-0">
           <input
             class="form-control mr-sm-2"
             type="search"
@@ -41,7 +40,7 @@
             v-model="keyword"
           />
           <button @click="onSearch" class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
+        </div>
       </div>
     </nav>
     <div class="container" style="margin-top:20px;">
@@ -92,7 +91,7 @@
   </div>
 </template>
 <script>
-import fd from './fakeData';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'ProductList',
@@ -102,6 +101,7 @@ export default {
       list: [],
     };
   },
+  computed: mapGetters(['products', 'productLoading']),
   methods: {
     onSearch() {
       let filterFunc = () => true;
@@ -109,10 +109,11 @@ export default {
         const reg = new RegExp(this.keyword);
         filterFunc = (i) => reg.test(i.name);
       }
-      this.list = fd.data.data.filter(filterFunc);
+      this.list = this.products.filter(filterFunc);
     },
   },
-  mounted() {
+  async mounted() {
+    await this.$store.dispatch('getProducts');
     this.onSearch();
   },
 };
@@ -121,6 +122,9 @@ export default {
 img {
   max-width: 100%;
   height: auto;
+}
+.navbar-toggler{
+  cursor: pointer;
 }
 .default-btn {
   font-size: 16px;

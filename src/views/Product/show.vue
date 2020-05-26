@@ -10,9 +10,9 @@
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex';
 import carousel from 'vue-owl-carousel';
 
-import fd from './fakeData';
 
 export default {
   name: 'ProductShow',
@@ -28,13 +28,17 @@ export default {
       },
     };
   },
-  mounted() {
+  computed: mapGetters(['products', 'productLoading']),
+  async mounted() {
     this.id = this.$route.query && +this.$route.query.id;
     if (!this.id) {
       window.location.href = '/';
       return;
     }
-    this.item = fd.data.data.find((i) => +i.id === this.id);
+    if (this.products.length === 0) {
+      await this.$store.dispatch('getProducts');
+    }
+    this.item = this.products.find((i) => +i.id === this.id);
     if (!this.item) {
       window.location.href = '/';
     }
